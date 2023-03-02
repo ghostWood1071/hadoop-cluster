@@ -72,7 +72,7 @@ class QueryModel(BaseModel):
 def get_query(names, time_ranges):
     builder = ConditionBuilder(names, time_ranges)
     query = f'''
-        Select s.rowkey
+        Select s.rowkey,
         s.video_id,
         s.url,
         s.time_start,
