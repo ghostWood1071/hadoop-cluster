@@ -87,7 +87,7 @@ def get_query(names, time_ranges):
          where f.segment_id = s.rowkey and f.video_id = s.video_id
          limit 1) as cover
         from segments as s
-        {builder.get_condtion()} order by s.time_start;
+        {builder.get_condtion()} order by s.time_start
     '''
     return query
 
