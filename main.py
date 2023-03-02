@@ -72,8 +72,9 @@ class QueryModel(BaseModel):
 def get_query(names, time_ranges):
     builder = ConditionBuilder(names, time_ranges)
     query = f'''
-        Select s.url,
+        Select s.rowkey
         s.video_id,
+        s.url,
         s.time_start,
         s.time_end,
         (select f.content from frames f
