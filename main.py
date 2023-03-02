@@ -66,7 +66,7 @@ class ConditionBuilder():
 
 class QueryModel(BaseModel):
     names: List[str] = Field(default=[])
-    time_ranges = List[str] = Field(default=[0,0])
+    time_ranges:List[float] = Field(default=[0,0])
     
 
 def get_query(names, time_ranges):
