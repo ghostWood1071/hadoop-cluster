@@ -114,6 +114,7 @@ def get_segments(params:QueryModel):
         query = get_query(params.names, params.time_ranges)
         print(query)
         query = query.replace('\n', ' ')
+        print(query)
         db_result = execute(query)
         cols = 'segment_id,video_id,url,time_start,time_end,cover'
         result = handle_result(cols, db_result)
