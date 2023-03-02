@@ -40,7 +40,13 @@ class ConditionBuilder():
         self.times = times
     def build_names(self):
         name_str_lst = str(tuple(self.names))
-        return f"name in {name_str_lst}"
+        return f''' exists (
+        select name
+        from trackings as t
+        where t.segment_id = s.row_key 
+        and s.video_id = t.video_id 
+        and t.name in {name_str_lst})'''
+        
     def build_times(self):
         q_time_min = self.times[0]
         q_time_max = self.times[1]
@@ -50,7 +56,7 @@ class ConditionBuilder():
         if q_time_min == 0:
             return f"({q_time_max}>=s.time_end and s.time_start<{q_time_max})"
         if q_time_max == 0:
-            return f"(s.time_start<={q_time_min})"
+            return f"(s.time_start>={q_time_min})"
         return f"({q_time_max}>=s.time_end and s.time_start<{q_time_max})\nand ({q_time_min}<s.time_end and s.time_start<={q_time_min})"
     def get_condtion(self):
         if self.times[0] == 0 and self.times[1] == 0:
@@ -72,21 +78,16 @@ class QueryModel(BaseModel):
 def get_query(names, time_ranges):
     builder = ConditionBuilder(names, time_ranges)
     query = f'''
-        Select s.rowkey,
+        select s.rowkey as segment_id,
         s.video_id,
         s.url,
         s.time_start,
         s.time_end,
-        (select f.content from frames f
-         where f.segment_id = s.rowkey
-         and f.video_id = s.video_id limit 1) as cover 
-        from
-        segments as s
-        join trackings t 
-        on s.video_id  = t.video_id and s.rowkey = t.segment_id
-        join videos as v
-        on v.rowkey = s.video_id
-        {builder.get_condtion()} order by s.time_start
+        (select f.content from frames as f
+         where f.segment_id = s.rowkey and f.video_id = s.video_id
+         limit 1) as cover
+        from segments as s
+        {builder.get_condtion()} order by s.time_start;
     '''
     return query
 
@@ -113,7 +114,7 @@ def get_segments(params:QueryModel):
         query = get_query(params.names, params.time_ranges)
         print(query)
         db_result = execute(query)
-        cols = 'url,video_id,time_start,time_end,cover'
+        cols = 'segment_id,video_id,url,time_start,time_end,cover'
         result = handle_result(cols, db_result)
         return result
     except Exception as e:
