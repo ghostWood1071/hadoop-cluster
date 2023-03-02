@@ -40,6 +40,8 @@ class ConditionBuilder():
         self.times = times
     def build_names(self):
         name_str_lst = str(tuple(self.names))
+        if len(self.names) == 1:
+            name_str_lst = name_str_lst.replace(',','')
         return f''' exists (
         select name
         from trackings as t
