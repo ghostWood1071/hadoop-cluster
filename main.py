@@ -76,19 +76,15 @@ def get_query(names, time_ranges):
         s.video_id,
         s.time_start,
         s.time_end,
-        f2.content as cover
+        (select f.content from frames f
+         where f.segment_id = s.rowkey
+         and f.video_id = s.video_id limit 1) as cover 
         from
         segments as s
         join trackings t 
         on s.video_id  = t.video_id and s.rowkey = t.segment_id
         join videos as v
         on v.rowkey = s.video_id
-        join (
-         select f.video_id, f.segment_id, f.content from frames f
-         where f.segment_id = s.rowkey
-         and f.video_id = s.video_id limit 1
-        ) as f2
-        on f2.video_id = s.video_id and s.rowkey = f2.segment_id
         {builder.get_condtion()} order by s.time_start
     '''
     return query
