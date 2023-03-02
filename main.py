@@ -76,13 +76,13 @@ def get_query(names, time_ranges):
         s.video_id,
         s.time_start,
         s.time_end,
-        (select content from frame f
+        (select f.content from frames f
         where f.segment_id = s.rowkey
         order by f.send_time
         limit 1) as cover
         from
         segments as s
-        join tracking t 
+        join trackings t 
         on s.video_id  = t.video_id and s.rowkey = t.segment_id
         join videos as v
         on v.rowkey = s.video_id
