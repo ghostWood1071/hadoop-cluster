@@ -111,6 +111,7 @@ def index():
 def get_segments(params:QueryModel):
     try:
         query = get_query(params.names, params.time_ranges)
+        print(query)
         db_result = execute(query)
         cols = 'url,video_id,time_start,time_end,cover'
         result = handle_result(cols, db_result)
