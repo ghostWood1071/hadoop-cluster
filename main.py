@@ -45,7 +45,7 @@ class ConditionBuilder():
         return f''' exists (
         select name
         from trackings as t
-        where t.segment_id = s.row_key 
+        where t.segment_id = s.rowkey 
         and s.video_id = t.video_id 
         and t.name in {name_str_lst})'''
         
@@ -85,10 +85,10 @@ def get_query(names, time_ranges):
         s.url,
         s.time_start,
         s.time_end,
-        (select f.content from frames as f
-         where f.segment_id = s.rowkey and f.video_id = s.video_id
-         limit 1) as cover
+        f.content as cover
         from segments as s
+        join  frames as f
+        on s.cover = f.rowkey
         {builder.get_condtion()} order by s.time_start
     '''
     return query
