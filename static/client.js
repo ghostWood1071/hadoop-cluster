@@ -10,8 +10,8 @@ app.controller('video_query', ($scope, $http)=>{
             method: 'POST',
             url: '/segments',
             data: {
-                'names': $scope.names_search.split(','),
-                'time_ranges': [$scope.time_search_start, $scope.time_search_end]
+                'names': $scope.names_search?$scope.names_search.split(','):[],
+                'time_ranges': [$scope.time_search_start?$scope.time_search_start:0, $scope.time_search_end?$scope.time_search_end:0]
             }
         }).then((res)=>{
             let segments = res.data;
