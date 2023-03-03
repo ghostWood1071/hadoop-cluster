@@ -82,6 +82,7 @@ def get_query(names, time_ranges):
     query = f'''
         select s.rowkey as segment_id,
         s.video_id,
+        v.location,
         s.url,
         s.time_start,
         s.time_end,
@@ -89,6 +90,8 @@ def get_query(names, time_ranges):
         from segments as s
         join  frames as f
         on s.cover = f.rowkey
+        join videos as v
+        on v.video_id = s.video_id
         {builder.get_condtion()} order by s.time_start
     '''
     return query
@@ -118,7 +121,7 @@ def get_segments(params:QueryModel):
         query = query.replace('\n', ' ').replace('\t',' ').replace('         ',' ')
         print(query)
         db_result = execute(query)
-        cols = 'segment_id,video_id,url,time_start,time_end,cover'
+        cols = 'segment_id,video_id,location,url,time_start,time_end,cover'
         result = handle_result(cols, db_result)
         return result
     except Exception as e:

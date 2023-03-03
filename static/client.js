@@ -2,6 +2,26 @@ var app = angular.module('video', []);
 
 app.controller('video_query', ($scope, $http)=>{
     $scope.playState = 0;
+
+
+    $scope.search = ()=>{
+        $http({
+            method: 'POST',
+            url: '/segments',
+            data: {
+                'names': $scope.names_search,
+                'time_ranges': [$scope.time_search_start, $scope.time_search_end]
+            }
+        }).then((res)=>{
+            let segments = res.data;
+            for(let seg of $scope.segments){
+                seg.cover = 'data:image/jpeg;base64,'+ seg.cover;
+            }
+            $scope.segments = segments;
+        });
+    }
+
+
     $scope.query = ()=>{
         console.log($scope.cols);
         console.log($scope.command);

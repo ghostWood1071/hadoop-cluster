@@ -28,7 +28,10 @@
           <div style="color: white;">video results</div>
           <div class="content" style="height: 85%; width: 100%; background-color: white; overflow-x: scroll; overflow-y: hidden;" >
             <div class="inner" style="height: 100%; white-space: nowrap;">
-              <div class="" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block;"></div>
+              <div ng-repeat="s in segments" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block; position: relative;">
+                <div style="position: absolute; top:0; left:0; padding:2px;">{{s.location}}</div>
+                <img src="{{s.cover}}" alt="{{s.location}}" srcset="" style="width: 100%;">
+              </div>
             </div>
           </div>
         </div>
@@ -36,7 +39,7 @@
           <div style="color: white;">frame results</div>
           <div class="content" style="height: 85%; width: 100%; background-color: white; overflow-x: scroll; overflow-y: hidden;" >
             <div class="inner" style="height: 100%; white-space: nowrap;">
-              <div class="" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block;"></div>
+              <div style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block;"></div>
             </div>
           </div>
         </div>
@@ -54,7 +57,7 @@
           <div class="modal-body">
             <div class="form-group">
               <label for="object">object</label>
-              <input type="text" id="object" class="form-control">
+              <input type="text" id="object" class="form-control" ng-model="names_search">
             </div>
           </div>
           <div class="modal-footer">
