@@ -91,7 +91,7 @@ def get_query(names, time_ranges):
         join  frames as f
         on s.cover = f.rowkey
         join videos as v
-        on v.video_id = s.video_id
+        on v.rowkey = s.video_id
         {builder.get_condtion()} order by s.time_start
     '''
     return query
