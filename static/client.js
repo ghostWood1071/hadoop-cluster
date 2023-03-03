@@ -5,6 +5,7 @@ app.controller('video_query', ($scope, $http)=>{
 
 
     $scope.search = ()=>{
+        console.log("alolasdaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         $http({
             method: 'POST',
             url: '/segments',
