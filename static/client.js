@@ -18,6 +18,8 @@ app.controller('video_query', ($scope, $http)=>{
                 seg.cover = 'data:image/jpeg;base64,'+ seg.cover;
             }
             $scope.segments = segments;
+        },(err)=>{
+            console.log(err);
         });
     }
 
