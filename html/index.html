@@ -12,25 +12,151 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="/static/angular.js"></script>
     <script src="/static/splide.min.js"></script>
+    <style>
+      .overlay {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background: #222;
+    }
+
+    .overlay__inner {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+
+    .overlay__content {
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .spinner {
+        width: 75px;
+        height: 75px;
+        display: inline-block;
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.05);
+        border-top-color: #fff;
+        animation: spin 1s infinite linear;
+        border-radius: 100%;
+        border-style: solid;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    </style>
 </head>
 <body ng-app="video" ng-controller="video_query" style="width:100%;" id="body">
     <div class="main" style="width:100%; height:100%; background-color: gray;">
       <div class="section1" style="width:100%; display: flex; height: 55%; border-bottom: 1px rgb(90, 88, 88) solid;">
-        <div class="search" style="width:50%; height:100%; border-right: 1px rgb(90, 88, 88) solid;">
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        <div class="search" style="width:50%; height:100%; border-right: 1px rgb(90, 88, 88) solid; background-color:white; padding:10px; overflow-y: scroll;">
+          
+          <!-- time condition  -->
+          <div style="display: flex;">
+            <div class="form-group" style="margin-right:10px">
+              <label for="from">from:</label>
+              <input type="datetime-local" name="" id="from" ng-model="from_time">
+            </div>
+            <div class="form-group">
+              <label for="to">to:</label>
+              <input type="datetime-local" name="" id="to" ng-model="to_time">
+            </div>
+          </div>
+
+          <!-- choose camera  -->
+          <div class="form-group">
+            <label for="cam">camera: </label>
+            <select name="" id="cam" ng-model="camera">
+              <option ng-repeat="c in cams" value="{{c}}">{{c}}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="human-prop">
+              <label for="box-1">Just have human: </label>
+              <input type="checkbox" name="" id="box-1" ng-model="justHuman" ng-change="justHumanChange()">
+            </div>
+            <div class="object-prop">
+              <label for="box-2">Just have object: </label>
+              <input  type="checkbox" name="" id="box-2" ng-model="justObject" ng-change="justObjectChange()">
+            </div>
+          </div>
+
+          
+          <div style="margin-bottom:10px;" >
+            <!-- human properties  -->
+            <div class="person-lst card human-prop" style="padding:10px">
+              <div>people list: <br> <label for="box-3">have people:</label> <input ng-model="haveHuman" ng-change="haveHumanChange()" type="checkbox" name="" id="box-3"></div>
+              <div style="display:flex; justify-content: space-around;" ng-repeat="p in people">
+                <div>{{$index+1}}</div>
+                <div class="form-group">
+                  <label for="upper">upper body:</label>
+                  <select id="upper" ng-model="p.upper" class="human">
+                    <option ng-repeat="c in colors" value="{{c}}">{{c}}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="lower">lower body: </label>
+                  <select id="lower" ng-model="p.lower" class="human">
+                    <option ng-repeat="c in colors" value="{{c}}">{{c}}</option>
+                  </select>
+                </div>
+                <div class="form-group"><button ng-click="addPerson()" class="btn btn-primary human">add person</button></div>
+                <div class="form-group"><button ng-click="delPerson($index)" class="btn btn-danger human" >delete person</button></div>
+              </div>
+            </div>
+
+            <!-- object properties -->
+            <div class="obj-lst card object-prop" style="padding:10px; margin-top: 10px;">
+              <div>object list: <br> <label for="box-4">have object:</label> <input type="checkbox" id="box-4" ng-model="haveObject" ng-change="haveObjectChange()"></div>
+              <div style="display:flex; justify-content: space-around;" ng-repeat="o in objects">
+                <div>{{$index+1}}</div>
+                <div class="form-group">
+                  <label for="obj-name">name:</label>
+                  <select name="" id="obj-name" ng-model="o.name" class="object">
+                    <option ng-repeat="n in objectNames" value="{{n}}">{{n}}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="obj-color">color:</label>
+                  <select name="" id="obj-color" ng-model="o.color" class="object">
+                    <option ng-repeat="c in colors" value="{{c}}">{{c}}</option>
+                  </select>
+                </div>
+                <div class="form-group"><button class="btn btn-primary object" ng-click="addObj()">add object</button></div>
+                <div class="form-group"><button class="btn btn-danger object" ng-click="delObj($index)">delete object</button></div>
+              </div>
+            </div>
+          </div>
+
+          <button ng-click="search()" type="button" class="btn btn-primary" >
             Search
           </button>
         </div>
-        <div class="video-play" style="width:50%; height: 100%;"></div>
+        <div class="video-play" style="width:50%; height: 100%;">
+          <video width="100%" height="100%" controls id="player">
+           
+          </video>
+        </div>
       </div>
       <div class="section2" style="height: 45%; width: 100%;">
         <div class="video-result list-unstyled"  style="width: 100%; height: 50%; border-bottom: 1px rgb(90, 88, 88) solid; padding-left: 7px; padding-right: 7px; padding-bottom: 5px;">
           <div style="color: white;">video results</div>
           <div class="content" style="height: 85%; width: 100%; background-color: white; overflow-x: scroll; overflow-y: hidden;" >
             <div class="inner" style="height: 100%; white-space: nowrap;">
-              <div ng-repeat="s in segments" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block; position: relative;">
-                <div style="position: absolute; top:0; left:0; padding:2px;">{{s.location}}</div>
-                <img src="{{s.cover}}" alt="{{s.location}}" srcset="" style="width: 100%;">
+              <div ng-click="get_frames(s.segment_id,s.video_id,s.url)" ng-repeat="s in segments" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block; position: relative;">
+                <div style="position: absolute; bottom:0; left:0; padding:2px; color:white; background-color: black;">{{s.location}}</div>
+                <img src="data:image/jpeg;base64,{{s.cover}}" alt="{{s.location}}" srcset="" style="width: 100%;">
               </div>
             </div>
           </div>
@@ -39,7 +165,10 @@
           <div style="color: white;">frame results</div>
           <div class="content" style="height: 85%; width: 100%; background-color: white; overflow-x: scroll; overflow-y: hidden;" >
             <div class="inner" style="height: 100%; white-space: nowrap;">
-              <div style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block;"></div>
+              <div ng-repeat="s in frames" style="height:100%; width: 270px; margin-right: 5px; background-color: aqua; display: inline-block; position: relative;">
+                <div style="position: absolute; bottom:0; left:0; padding:2px; color:white; background-color: black;">{{s.send_time}}</div>
+                <img src="data:image/jpeg;base64,{{s.content}}" alt="{{s.segment_id}}" srcset="" style="width: 100%;">
+              </div>
             </div>
           </div>
         </div>
@@ -56,8 +185,8 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label for="object">object</label>
-              <input type="text" id="object" class="form-control" ng-model="names_search">
+              <!-- <label for="object">object</label>
+              <input type="text" id="object" class="form-control" ng-model="names_search"> -->
             </div>
           </div>
           <div class="modal-footer">
@@ -66,7 +195,12 @@
           </div>
         </div>
       </div>
-    </div>    
+    </div>  
+    <div class="overlay" style="display: none;">
+      <div class="overlay__inner">
+          <div class="overlay__content"><span class="spinner"></span></div>
+      </div>
+    </div>  
     <script>
       var body = document.getElementById('body');
       body.style.height = document.documentElement.clientHeight+"px";
