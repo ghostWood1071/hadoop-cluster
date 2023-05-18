@@ -9,6 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import requests
 from starlette.responses import StreamingResponse
+from mysql import connector
+from db import Helper
 
 app = FastAPI()
 db_host = '192.168.100.126'
@@ -23,6 +25,12 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+mysqlHelper = Helper('localhost', '3307', 'root', 'hduser@123')
+mysqlHelper.init_db('video_processing_dim')
+mysqlHelper.create_table('colors', ['color_id int primary key', 'color_name varchar(20) not null', 'color_rgb varchar(11)'])
+mysqlHelper.create_table('objects', ['object_id int primary key', 'object_name varchar(50) not null'])
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -165,8 +173,7 @@ class ConditionBuilder():
         return 'where '+ ' and '.join(conditions)
         # return 'where exists ()'
         #where_condition = where_condition + time_condition
-        
-       
+      
 
 
 def get_query(camera, people, objs, times, just_human, just_object, have_human, have_object):
@@ -261,8 +268,10 @@ def get_object_names():
 
 @app.get('/colors')
 def get_colors():
-    colors = ['red', 'white', 'black', 'yellow', 'blue', 'green', 'brown', 'pink', 'gray', 'olive']
-    return colors    
+    data = mysqlHelper.excute("select * from colors")
+    print(data)
+    # colors = ['red', 'white', 'black', 'yellow', 'blue', 'green', 'brown', 'pink', 'gray', 'olive']
+    return data  
 
 @app.get('/cameras')
 def get_cameras():
